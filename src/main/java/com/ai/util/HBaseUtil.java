@@ -8,6 +8,8 @@ import org.apache.hadoop.hbase.TableName;
 import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.filter.FilterList;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -17,9 +19,13 @@ import java.util.List;
  * @author tq
  * @date 2019/12/9 17:05
  */
+
+@Service
 public class HBaseUtil {
 
+
     private static Connection getConnection() {
+
         Connection connection = null;
         try {
             Configuration configuration = HBaseConfiguration.create();
@@ -78,17 +84,17 @@ public class HBaseUtil {
     //查询单条数据
     public static Result getRow(String tableName, String rowkey) throws IOException {
         Table table = getTable(tableName);
-            Get get = new Get(Bytes.toBytes(rowkey));
-            return table.get(get);
+        Get get = new Get(Bytes.toBytes(rowkey));
+        return table.get(get);
 
     }
 
     //检索数据
-    public static ResultScanner getScanner(String tableName, String startKey, String stopKey) throws IOException {
+    public ResultScanner getScanner(String tableName, String startKey, String stopKey) throws IOException {
         Table table = getTable(tableName);
         Scan scan = new Scan();
-//            scan.setStartRow(Bytes.toBytes(startKey));
-//            scan.setStopRow(Bytes.toBytes(stopKey));
+        scan.setStartRow(Bytes.toBytes(startKey));
+        scan.setStopRow(Bytes.toBytes(stopKey));
         scan.setCaching(1000);
         ResultScanner results = table.getScanner(scan);
 

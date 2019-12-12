@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.ai.controller","com.ai.service"})
+@ComponentScan(basePackages = {"com.ai.controller","com.ai.service","com.ai.util"})
 @MapperScan(basePackages = {"com.ai.dao"})
 public class AiHBaseApplication {
 

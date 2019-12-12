@@ -4,7 +4,9 @@ import cn.huacloud.platform.sdk.client.AIOpenClient;
 import com.ai.util.HBaseUtil;
 import com.ai.util.MySQLUtil;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.util.Bytes;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 
 /**
  * @author tq
@@ -49,6 +52,62 @@ public class MySQLToHBase {
             JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(result).replaceAll("[\\[]]", "null"));
 
             JSONObject document_reference = jsonObject.getJSONObject("document_reference");
+            JSONArray defendantsArr = jsonObject.getJSONArray("defendants");
+            int defendantsLength = defendantsArr.toArray().length;
+            if (defendantsLength > 0) {
+                for (int i = 0; i < defendantsLength; i++) {
+                    JSONObject defendantsObj = defendantsArr.getJSONObject(i);
+                    JSONObject defendant_base = defendantsObj.getJSONObject("defendant_base");
+                    Object[] defendant_baseK = defendant_base.keySet().toArray();
+                    for (int j = 0; j < defendant_baseK.length; j++) {
+                        if ("special_identity".equalsIgnoreCase(defendant_baseK[i].toString())) {
+                            JSONObject special_identity = defendant_base.getJSONObject("special_identity");
+                            Object[] array = special_identity.keySet().toArray();
+                            if (array.length > 0) {
+                                for (int k = 0; k < array.length; k++) {
+                                    put.addColumn(family, Bytes.toBytes("defendants" + i + ":defendant_base:special_identity:" + array[k]), Bytes.toBytes(special_identity.getString(array[k].toString())));
+                                }
+                            }
+                        }
+
+                        put.addColumn(family, Bytes.toBytes("defendants" + i + ":defendant_base:" + defendant_baseK[j]), Bytes.toBytes(defendant_base.getString(defendant_baseK[j].toString())));
+                    }
+
+                    JSONArray defendant_preConvictionsArr = defendantsObj.getJSONArray("defendant_preConvictions");
+                    int defendant_preConvictionsArrLen = defendant_preConvictionsArr.toArray().length;
+                    if (defendant_preConvictionsArrLen > 0) {
+                        for (int j = 0; j < defendant_preConvictionsArrLen; j++) {
+                            JSONObject defendant_preConvictionsObj = defendant_preConvictionsArr.getJSONObject(j);
+                            Object[] defendant_preConvictionsK = defendant_preConvictionsObj.keySet().toArray();
+                            for (int k = 0; k < defendant_preConvictionsK.length; k++) {
+                                put.addColumn(family, Bytes.toBytes("defendants" + i + ":defendant_preConvictions" + j + ":" + defendant_preConvictionsK[k]), Bytes.toBytes(defendant_preConvictionsObj.getString(defendant_preConvictionsK[k].toString())));
+                            }
+                        }
+                    }
+
+                    JSONArray  chargesArr=defendantsObj.getJSONArray("charges");
+                    int chargesArrLen=chargesArr.toArray().length;
+                    if (chargesArrLen>0){
+                        for (int j = 0; j <chargesArrLen ; j++) {
+                            JSONObject chargesObj=chargesArr.getJSONObject(j);
+                            Object[] chargesK=chargesObj.keySet().toArray();
+                            for (int k = 0; k <chargesK.length ; k++) {
+                                if("charge_enforcements".equalsIgnoreCase(chargesK[k].toString())){
+                                    JSONArray charge_enforcementsArr = chargesObj.getJSONArray("charge_enforcements");
+                                    int charge_enforcementsArrLen = charge_enforcementsArr.size();
+                                    for (int l = 0; l <charge_enforcementsArrLen ; l++) {
+                                        JSONObject charge_enforcementsObj = charge_enforcementsArr.getJSONObject(l);
+                                        Object[] charge_enforcementsK = charge_enforcementsObj.keySet().toArray();
+                                        for (int m = 0; m <charge_enforcementsK.length ; m++) {
+
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             JSONObject defendants0 = jsonObject.getJSONArray("defendants").getJSONObject(0);
 
             JSONObject accusation = jsonObject.getJSONObject("accusation");
@@ -113,7 +172,7 @@ public class MySQLToHBase {
             String defendants02charges2charge_enforcements2charge_enforcement_time2index1 = defendants0.getJSONArray("charges").getJSONObject(0).getJSONArray("charge_enforcements").getJSONObject(1).getJSONObject("charge_enforcement_time").getString("index");
             String defendants02charges2charge_enforcements2charge_enforcement_time2text1 = defendants0.getJSONArray("charges").getJSONObject(0).getJSONArray("charge_enforcements").getJSONObject(1).getJSONObject("charge_enforcement_time").getString("text");
 
-            if(defendants0.getJSONArray("charges").getJSONObject(0).getJSONArray("charge_enforcements").getJSONObject(1).containsKey("charge_enforcement_organ")){
+            if (defendants0.getJSONArray("charges").getJSONObject(0).getJSONArray("charge_enforcements").getJSONObject(1).containsKey("charge_enforcement_organ")) {
                 String defendants02charges2charge_enforcements2charge_enforcement_organ2index1 = defendants0.getJSONArray("charges").getJSONObject(0).getJSONArray("charge_enforcements").getJSONObject(1).getJSONObject("charge_enforcement_organ").getString("index");
                 String defendants02charges2charge_enforcements2charge_enforcement_organ2text1 = defendants0.getJSONArray("charges").getJSONObject(0).getJSONArray("charge_enforcements").getJSONObject(1).getJSONObject("charge_enforcement_organ").getString("text");
 
@@ -264,7 +323,7 @@ public class MySQLToHBase {
 
                 String defendants12defendant_base2NN = defendants1.getJSONObject("defendant_base").getString("NN");
 
-                if(defendants1.getJSONObject("defendant_base").containsKey("BD")){
+                if (defendants1.getJSONObject("defendant_base").containsKey("BD")) {
                     String defendants12defendant_base2BD2index = defendants1.getJSONObject("defendant_base").getJSONObject("BD").getString("index");
                     String defendants12defendant_base2BD2text = defendants1.getJSONObject("defendant_base").getJSONObject("BD").getString("text");
 
@@ -280,8 +339,18 @@ public class MySQLToHBase {
                 String defendants12defendant_base2PS = defendants1.getJSONObject("defendant_base").getString("PS");
                 String defendants12defendant_base2defendant_nativePlace = defendants1.getJSONObject("defendant_base").getString("defendant_nativePlace");
 
-                String defendants12defendant_base2E2index = defendants1.getJSONObject("defendant_base").getJSONObject("E").getString("index");
-                String defendants12defendant_base2E2text = defendants1.getJSONObject("defendant_base").getJSONObject("E").getString("text");
+                if (defendants1.getJSONObject("defendant_base").containsKey("E")) {
+                    String defendants12defendant_base2E2index = defendants1.getJSONObject("defendant_base").getJSONObject("E").getString("index");
+                    String defendants12defendant_base2E2text = defendants1.getJSONObject("defendant_base").getJSONObject("E").getString("text");
+
+                    if (defendants12defendant_base2E2index != null) {
+                        put.addColumn(family, Bytes.toBytes("defendants12defendant_base2E2index"), Bytes.toBytes(defendants12defendant_base2E2index));
+                    }
+                    if (defendants12defendant_base2E2text != null) {
+                        put.addColumn(family, Bytes.toBytes("defendants12defendant_base2E2text"), Bytes.toBytes(defendants12defendant_base2E2text));
+                    }
+                }
+
 
 //        String defendants12defendant_base2FN2index=defendants1.getJSONObject("defendant_base").getJSONObject("FN").getString("index");
 //        String defendants12defendant_base2FN2text=defendants1.getJSONObject("defendant_base").getJSONObject("FN").getString("text");
@@ -386,12 +455,7 @@ public class MySQLToHBase {
                 if (defendants12defendant_base2defendant_nativePlace != null) {
                     put.addColumn(family, Bytes.toBytes("defendants12defendant_base2defendant_nativePlace"), Bytes.toBytes(defendants12defendant_base2defendant_nativePlace));
                 }
-                if (defendants12defendant_base2E2index != null) {
-                    put.addColumn(family, Bytes.toBytes("defendants12defendant_base2E2index"), Bytes.toBytes(defendants12defendant_base2E2index));
-                }
-                if (defendants12defendant_base2E2text != null) {
-                    put.addColumn(family, Bytes.toBytes("defendants12defendant_base2E2text"), Bytes.toBytes(defendants12defendant_base2E2text));
-                }
+
                 if (defendants12defendant_base2defendant_capacity != null) {
                     put.addColumn(family, Bytes.toBytes("defendants12defendant_base2defendant_capacity"), Bytes.toBytes(defendants12defendant_base2defendant_capacity));
                 }
@@ -782,7 +846,7 @@ public class MySQLToHBase {
 
             putsList.add(put);
 
-            HBaseUtil.putRows("tq",putsList);
+            HBaseUtil.putRows("tq", putsList);
             System.out.println("已经有" + putsList.size() + "行");
         }
         HBaseUtil.putRows("tq", putsList);

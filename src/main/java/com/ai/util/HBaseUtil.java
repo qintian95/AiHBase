@@ -39,7 +39,7 @@ public class HBaseUtil {
     //创建表，如果存在则不创建
     public static boolean createTable(String tableName, String cfs) {
         try (HBaseAdmin admin = (HBaseAdmin) getConnection().getAdmin()) {
-            if (admin.tableExists(tableName)) {
+            if (admin.tableExists(TableName.valueOf(tableName))) {
                 return false;
             }
             HTableDescriptor tableDescriptor = new HTableDescriptor(TableName.valueOf(tableName));

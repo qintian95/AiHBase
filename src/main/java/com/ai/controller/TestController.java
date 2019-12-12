@@ -31,8 +31,6 @@ public class TestController {
     @Autowired
     JudicialDocumentService judicialDocumentService;
 
-
-
     @GetMapping
     public  byte[] getContent() throws IOException {
 

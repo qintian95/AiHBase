@@ -264,7 +264,7 @@ public class MySQLToHBase {
 
                 String defendants12defendant_base2NN = defendants1.getJSONObject("defendant_base").getString("NN");
 
-                if(defendants1.getJSONObject("defendant_base").getJSONObject("BD").containsKey("BD")){
+                if(defendants1.getJSONObject("defendant_base").containsKey("BD")){
                     String defendants12defendant_base2BD2index = defendants1.getJSONObject("defendant_base").getJSONObject("BD").getString("index");
                     String defendants12defendant_base2BD2text = defendants1.getJSONObject("defendant_base").getJSONObject("BD").getString("text");
 

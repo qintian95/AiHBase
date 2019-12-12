@@ -39,9 +39,10 @@ public class AiTest {
         //使用fastjson将结果转换成String打印到控制台
 //        System.out.println(result);
 
-        System.out.println(JSON.toJSONString(result).replaceAll("[\\[]]","null"));
+//        System.out.println(JSON.toJSONString(result).replaceAll("[\\[]]","null"));
 
         JSONObject jsonObject=JSON.parseObject(JSON.toJSONString(result).replaceAll("[\\[]]","null"));
+
 
         JSONObject document_reference=jsonObject.getJSONObject("document_reference");
         JSONObject defendants0=jsonObject.getJSONArray("defendants").getJSONObject(0);
@@ -286,7 +287,9 @@ public class AiTest {
         String document_type=jsonObject.getString("document_type");
         String prosecutors=jsonObject.getString("prosecutors");
 
-        System.out.println(jsonObject.getJSONArray("defendants").getJSONObject(0).getJSONArray("charges").getJSONObject(0).getJSONObject("suspect_charge_name"));
+
+        String a=jsonObject.getJSONArray("defendants").getJSONObject(0).getJSONArray("charges").getJSONObject(0).getJSONObject("suspect_charge_name1").getString("a");
+        System.out.println(a);
 
     }
 }

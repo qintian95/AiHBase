@@ -194,13 +194,15 @@ public class MySQLToHBase {
                     Object[] hear_infoK = hear_infoObj.keySet().toArray();
                     for (int i = 0; i < hear_infoK.length; i++) {
                         if ("hear_prosecutors".equalsIgnoreCase(hear_infoK[i].toString())) {
-                            JSONArray hear_prosecutorsArr = hear_infoObj.getJSONArray("hear_prosecutors");
-                            for (int j = 0; j < hear_prosecutorsArr.size(); j++) {
-                                if (hear_prosecutorsArr.get(j).toString().contains(":")) {
-                                    JSONObject hear_prosecutorsObj = hear_prosecutorsArr.getJSONObject(j);
-                                    Object[] hear_prosecutorsK = hear_prosecutorsObj.keySet().toArray();
-                                    for (int k1 = 0; k1 < hear_prosecutorsK.length; k1++) {
-                                        put.addColumn(family, Bytes.toBytes("hear_info:" + "hear_prosecutors" + j + ":" + hear_prosecutorsK[k1]), Bytes.toBytes(hear_prosecutorsObj.getString(hear_prosecutorsK[k1].toString())));
+                            if (hear_infoObj.getString("hear_prosecutors").contains("[")) {
+                                JSONArray hear_prosecutorsArr = hear_infoObj.getJSONArray("hear_prosecutors");
+                                for (int j = 0; j < hear_prosecutorsArr.size(); j++) {
+                                    if (hear_prosecutorsArr.get(j).toString().contains(":")) {
+                                        JSONObject hear_prosecutorsObj = hear_prosecutorsArr.getJSONObject(j);
+                                        Object[] hear_prosecutorsK = hear_prosecutorsObj.keySet().toArray();
+                                        for (int k1 = 0; k1 < hear_prosecutorsK.length; k1++) {
+                                            put.addColumn(family, Bytes.toBytes("hear_info:" + "hear_prosecutors" + j + ":" + hear_prosecutorsK[k1]), Bytes.toBytes(hear_prosecutorsObj.getString(hear_prosecutorsK[k1].toString())));
+                                        }
                                     }
                                 }
                             }

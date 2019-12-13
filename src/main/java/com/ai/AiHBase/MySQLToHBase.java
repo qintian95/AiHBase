@@ -52,6 +52,8 @@ public class MySQLToHBase {
             byte[] family = Bytes.toBytes("info");
 
             result = aiOpenClient.nerAggregation("xsyspj", text);
+
+            //把null值，[]数组都替换成 无
             JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(result).replaceAll("[\\[]]", "\"无\"").replaceAll("null", "\"无\""));
 
             Object[] jsonObjectArr = jsonObject.keySet().toArray();

@@ -32,11 +32,11 @@ public class TestController {
     HBaseUtil hBaseUtil;
 
     @GetMapping("/query")
-    public  Map<String,Map<String,String>>  getContent() throws IOException {
+    public  Map<String,Map<String,String>>  getContent(String startDate,String stopDate) throws IOException {
 
 
-        ResultScanner hbaseResults = hBaseUtil.getScanner("tq", "2019-12-12 00:09:04.0_f891ea7d-53e3-473b-8b6e-a8d400b6351f", "2019-12-12 00:09:04.0_f891ea7d-53e3-473b-8b6e-a8d400b6351f");
-
+        System.out.println(startDate+"       "+stopDate);
+        ResultScanner hbaseResults = hBaseUtil.getScanner("tq", startDate, stopDate);
         //返回的是如下结构  map（rowkey，map（列名，值））
         Map<String,Map<String,String>> resultMap = new HashMap<>();
 
@@ -57,5 +57,4 @@ public class TestController {
         }
         return resultMap;
     }
-
 }

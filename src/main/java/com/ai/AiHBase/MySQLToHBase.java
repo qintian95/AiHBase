@@ -89,9 +89,9 @@ public class MySQLToHBase {
                                 for (int k1 = 0; k1 < special_identityArr.length; k1++) {
                                     put.addColumn(family, Bytes.toBytes("defendants" + i + "-defendant_base-special_identity-" + special_identityArr[k1]), Bytes.toBytes(special_identityObj.getString(special_identityArr[k1].toString())));
                                 }
+                            }else {
+                                put.addColumn(family, Bytes.toBytes("defendants" + i + "-defendant_base-" + defendant_baseK[j]), Bytes.toBytes(defendant_base.getString(defendant_baseK[j].toString())));
                             }
-
-                            put.addColumn(family, Bytes.toBytes("defendants" + i + "-defendant_base-" + defendant_baseK[j]), Bytes.toBytes(defendant_base.getString(defendant_baseK[j].toString())));
                         }
 
                         JSONArray defendant_preConvictionsArr = defendantsObj.getJSONArray("defendant_preConvictions");
